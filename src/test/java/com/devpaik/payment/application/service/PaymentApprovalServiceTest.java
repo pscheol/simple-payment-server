@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 @ExtendWith(SpringExtension.class)
 class PaymentApprovalServiceTest {
@@ -54,7 +55,7 @@ class PaymentApprovalServiceTest {
         PaymentDetail detail = new PaymentDetail("1234-5678-9123-4567", "12/24" ,"335");
         PaymentApprovalRequest request = new PaymentApprovalRequest("userId1234", new BigDecimal("100.00"), CurrencyCode.Code.USD,
                 "merchantId1234", PaymentMethod.creditCard, detail);
-        PaymentApprovalCommand command = PaymentApprovalCommand.of(request);
+        PaymentApprovalCommand command = PaymentApprovalCommand.of(request, ZoneId.systemDefault());
 
 
         LocalDateTime startDtm = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);

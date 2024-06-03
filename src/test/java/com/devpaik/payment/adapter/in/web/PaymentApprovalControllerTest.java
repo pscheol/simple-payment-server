@@ -24,6 +24,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,7 +57,7 @@ class PaymentApprovalControllerTest {
         PaymentDetail detail = new PaymentDetail("1234-5678-9123-4567", "12/24" ,"335");
         PaymentApprovalRequest request = new PaymentApprovalRequest(userId, new BigDecimal("150.00"), CurrencyCode.Code.USD,
                 merchantId, PaymentMethod.creditCard, detail);
-        PaymentApprovalCommand command = PaymentApprovalCommand.of(request);
+        PaymentApprovalCommand command = PaymentApprovalCommand.of(request, ZoneId.systemDefault());
 
         ExchangeRate exchangeRate = new ExchangeRate(new BigDecimal("1319.51"));
         Wallet wallet = Wallet.createWallet(WalletId.genWalletId(), "user1234", "USD", new BigDecimal("10000.50"));
