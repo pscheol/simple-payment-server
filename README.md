@@ -100,24 +100,24 @@
 
 ### tb_payment_approval - 결제승인 테이블
 
-|     COLUMN     |     TYPE      | KEY |  NULL?   |      Default      |           COMMENT            |
-|:--------------:|:-------------:|:---:|:--------:|:-----------------:|:----------------------------:|
-|   payment_id   |  varchar(60)  | PK  | NOT NULL |                   |             승인번호             |
-|  merchant_id   |  varchar(60)  |     | NOT NULL |                   |             상점ID             |
-|    user_id     |  varchar(60)  |     | NOT NULL |                   |            사용자ID             |
-|  payment_dtm   |   datetime    |     |   NULL   | current_timestamp |             결제일시             |
-| payment_method |  varchar(20)  |     |   NULL   |                   |    거래유형(creditCard,point)    |
-|    card_num    |  varchar(20)  |     |   NULL   |                   |             카드번호             |
-|     status     |  varchar(20)  |     |   NULL   |                   | 승인상태request,approved,failed) |
-|     amount     | decimal(18,2) |     |   NULL   |                   |             지불금액             |
-|      fee       | decimal(5,2)  |     |   NULL   |                   |             수수료              |
-| currency_code  |    char(3)    |     |   NULL   |                   |             통화코드             |
-| exchange_rate  | decimal(18,2) |     |   NULL   |                   |             적용환율             |
-| wallet_amount  | decimal(18,2) |     |   NULL   |                   |         지갑(포인트)지불금액          |
-|  card_amount   | decimal(18,2) |     |   NULL   |                   |          신용카드 결제금액           |
-|   won_amount   |    bigint     |     |   NULL   |                   |             원화금액             |
-|  amount_total  | decimal(18,2) |     |   NULL   |                   |            총지불금액             |
-| after_balance  | decimal(18,2) |     |   NULL   |                   |            거래후잔액             |
+|     COLUMN     |     TYPE      | KEY |  NULL?   | Default |           COMMENT            |
+|:--------------:|:-------------:|:---:|:--------:|:-------:|:----------------------------:|
+|   payment_id   |  varchar(60)  | PK  | NOT NULL |         |             승인번호             |
+|  merchant_id   |  varchar(60)  |     | NOT NULL |         |             상점ID             |
+|    user_id     |  varchar(60)  |     | NOT NULL |         |            사용자ID             |
+|  payment_dtm   |   datetime    |     |   NULL   |         |             결제일시             |
+| payment_method |  varchar(20)  |     |   NULL   |         |    거래유형(creditCard,point)    |
+|    card_num    |  varchar(20)  |     |   NULL   |         |             카드번호             |
+|     status     |  varchar(20)  |     |   NULL   |         | 승인상태request,approved,failed) |
+|     amount     | decimal(18,2) |     |   NULL   |         |             지불금액             |
+|      fee       | decimal(5,2)  |     |   NULL   |         |             수수료              |
+| currency_code  |    char(3)    |     |   NULL   |         |             통화코드             |
+| exchange_rate  | decimal(18,2) |     |   NULL   |         |             적용환율             |
+| wallet_amount  | decimal(18,2) |     |   NULL   |         |         지갑(포인트)지불금액          |
+|  card_amount   | decimal(18,2) |     |   NULL   |         |          신용카드 결제금액           |
+|   won_amount   |    bigint     |     |   NULL   |         |             원화금액             |
+|  amount_total  | decimal(18,2) |     |   NULL   |         |            총지불금액             |
+| after_balance  | decimal(18,2) |     |   NULL   |         |            거래후잔액             |
 
 
 
