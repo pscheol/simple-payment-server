@@ -19,7 +19,7 @@ public record PaymentApprovalResponse(
                 approval.getStatus().toString(),
                 approval.getAmountTotalScale().getValue(),
                 approval.getCurrencyCode().getValue(),
-                approval.getPaymentDtm().getDatetime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                approval.getPaymentDtm().getDatetime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
         );
     }
 }

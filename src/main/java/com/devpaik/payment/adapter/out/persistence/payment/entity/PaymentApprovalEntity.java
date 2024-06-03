@@ -13,7 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Entity
@@ -42,7 +42,7 @@ public class PaymentApprovalEntity implements Serializable {
     @Column(name = "payment_dtm")
     @Comment("결제일시")
     @Getter
-    private LocalDateTime paymentDtm;
+    private ZonedDateTime paymentDtm;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "paymentMethod", length = 20)
@@ -108,7 +108,7 @@ public class PaymentApprovalEntity implements Serializable {
 
 
     @Builder
-    public PaymentApprovalEntity(String paymentId, String merchantId, String userId, LocalDateTime paymentDtm,
+    public PaymentApprovalEntity(String paymentId, String merchantId, String userId, ZonedDateTime paymentDtm,
                                  PaymentMethod paymentMethod, String cardNum, Status status, BigDecimal amount,
                                  BigDecimal fee, String currencyCode, BigDecimal exchangeRate, BigDecimal walletAmount,
                                  BigDecimal cardAmount, Long wonAmount, BigDecimal amountTotal, BigDecimal afterBalance) {

@@ -4,18 +4,20 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 public class PaymentDtm implements Serializable {
     @Getter
-    private final LocalDateTime datetime;
+    private final ZonedDateTime datetime;
 
-    public PaymentDtm(LocalDateTime datetime) {
+    public PaymentDtm(ZonedDateTime datetime) {
         this.datetime = datetime;
     }
 
-    public static PaymentDtm nowDtm() {
-        return new PaymentDtm(LocalDateTime.now());
+    public static PaymentDtm nowDtm(ZoneId zoneId) {
+        return new PaymentDtm(LocalDateTime.now().atZone(zoneId));
     }
 
     @Override

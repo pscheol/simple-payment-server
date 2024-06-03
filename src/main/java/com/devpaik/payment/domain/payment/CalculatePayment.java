@@ -50,7 +50,7 @@ public record CalculatePayment(
                 PaymentId.createUUID(),
                 command.merchantId(),
                 command.userId(),
-                PaymentDtm.nowDtm(),
+                PaymentDtm.nowDtm(command.zoneId()),
                 command.paymentMethod(),
                 Objects.isNull(command.paymentDetail()) ? null : command.paymentDetail().cardNum(),
                 Status.setStatusAndGet(cardAmount),

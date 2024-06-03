@@ -8,6 +8,7 @@ import com.devpaik.payment.domain.payment.field.CardNum;
 import com.devpaik.payment.domain.payment.field.PaymentMethod;
 import com.devpaik.payment.domain.user.field.UserId;
 
+import java.time.ZoneId;
 import java.util.Objects;
 
 public record PaymentApprovalCommand(
@@ -16,10 +17,10 @@ public record PaymentApprovalCommand(
         CurrencyCode currencyCode,
         MerchantId merchantId,
         PaymentMethod paymentMethod,
-        PaymentDetailCommand paymentDetail
-) {
+        PaymentDetailCommand paymentDetail,
+        ZoneId zoneId) {
 
-    public static PaymentApprovalCommand of(PaymentApprovalRequest request) {
+    public static PaymentApprovalCommand of(PaymentApprovalRequest request, ZoneId zoneId) {
         PaymentDetailCommand detailCommand = null;
         if (Objects.nonNull(request.paymentDetail())) {
             detailCommand = new PaymentDetailCommand(
@@ -35,7 +36,8 @@ public record PaymentApprovalCommand(
                 CurrencyCode.createCurrencyCode(request.currency()),
                 new MerchantId(request.merchantId()),
                 request.paymentMethod(),
-                detailCommand
+                detailCommand,
+                zoneId
         );
     }
 }
