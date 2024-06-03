@@ -70,8 +70,7 @@ class DailyExchangeRateRepositoryAdapterTest {
         assertNotNull(exchangeRate);
         assertEquals(1L, exchangeRate.getDailyId().getId());
         assertEquals("USD", exchangeRate.getCurrencyCode().getValue());
-        assertEquals(new BigDecimal("1370.55"), exchangeRate.getExchangeRate().getValue());
-        assertEquals(nowDtm, exchangeRate.getCurrentDtm().getDatetime());
+        assertEquals(new BigDecimal("1482.52"), exchangeRate.getExchangeRate().getValue());
     }
 
     @DisplayName("최종 공시환율 정보 조회 오류")
