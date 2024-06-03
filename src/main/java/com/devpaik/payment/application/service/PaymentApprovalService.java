@@ -13,7 +13,8 @@ import com.devpaik.payment.domain.exchangerate.field.CurrencyCode;
 import com.devpaik.payment.domain.exchangerate.field.ExchangeRate;
 import com.devpaik.payment.domain.payment.CalculatePayment;
 import com.devpaik.payment.domain.payment.PaymentApproval;
-import com.devpaik.payment.domain.payment.field.*;
+import com.devpaik.payment.domain.payment.field.CardAmount;
+import com.devpaik.payment.domain.payment.field.PaymentMethod;
 import com.devpaik.payment.domain.user.Wallet;
 import com.devpaik.payment.domain.user.field.UserId;
 import com.devpaik.payment.exception.InSufficientBalanceException;
@@ -26,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Objects;
 
 @Transactional
 @Slf4j
@@ -86,62 +86,8 @@ public class PaymentApprovalService implements PaymentApprovalUseCase {
         insertPaymentApprovalPort.savePaymentApproval(paymentApproval);
     }
 
-    public PaymentApproval createPaymentApproval(CalculatePayment calculatePayment) {
-        return new PaymentApproval(
-                calculatePayment.paymentId(),
-                calculatePayment.merchantId(),
-                calculatePayment.userId(),
-                calculatePayment.paymentDtm(),
-                calculatePayment.paymentMethod(),
-                calculatePayment.cardNum(),
-                calculatePayment.status(),
-                calculatePayment.amount(),
-                calculatePayment.fee(),
-                calculatePayment.currencyCode(),
-                calculatePayment.exchangeRate(),
-                calculatePayment.walletAmount(),
-                calculatePayment.cardAmount(),
-                calculatePayment.wonAmount(),
-                calculatePayment.amountTotal(),
-                calculatePayment.afterWallet().parseAfterBalance());
-    }
-
     private CalculatePayment convertToCalculatePayment(PaymentApprovalCommand command, Wallet wallet, ExchangeRate exchangeRate) {
         return CalculatePayment.calculate(command, wallet, exchangeRate, defaultFee);
-//        final Amount amount = command.amount();
-//        final Fee fee = Fee.createFee(defaultFee).calculate(amount);
-//        final AmountTotal amountTotal = new AmountTotal(amount.sum(fee.scaleValue()).getValue());
-//
-//
-//        final WalletAmount walletAmount;
-//        final CardAmount cardAmount;
-//
-//        if (wallet.checkSufficientBalance(amountTotal)) {
-//            walletAmount = WalletAmount.create(amountTotal.getValue(), command.currencyCode());
-//            cardAmount = CardAmount.createZero();
-//        } else {
-//            walletAmount = WalletAmount.create(wallet.getBalance().getValue(), command.currencyCode());
-//            cardAmount = CardAmount.calculateSubtract(walletAmount, amountTotal, command.currencyCode());
-//        }
-//
-//        return new CalculatePayment(
-//                PaymentId.createUUID(),
-//                command.merchantId(),
-//                command.userId(),
-//                PaymentDtm.nowDtm(),
-//                command.paymentMethod(),
-//                Objects.isNull(command.paymentDetail()) ? null : command.paymentDetail().cardNum(),
-//                Status.setStatusAndGet(cardAmount),
-//                amount,
-//                fee,
-//                command.currencyCode(),
-//                exchangeRate,
-//                walletAmount,
-//                cardAmount,
-//                WonAmount.calculateWonAmount(amountTotal, exchangeRate),
-//                amountTotal,
-//                wallet.withdrawWallet(walletAmount)
-//        );
     }
 
     private DailyExchangeRate getDailyExchangeRate(CurrencyCode currencyCode) {
