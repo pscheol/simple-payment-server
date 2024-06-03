@@ -2,6 +2,7 @@ package com.devpaik.payment.adapter.out.persistence.user;
 
 import com.devpaik.payment.adapter.out.persistence.user.repository.WalletRepository;
 import com.devpaik.payment.application.port.out.user.GetWalletInfoPort;
+import com.devpaik.payment.application.port.out.user.UpdateWalletPort;
 import com.devpaik.payment.domain.user.Wallet;
 import com.devpaik.payment.exception.NotFoundWalletException;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Component
-public class WalletRepositoryAdapter implements GetWalletInfoPort {
+public class WalletRepositoryAdapter implements GetWalletInfoPort, UpdateWalletPort {
     private final WalletRepository walletRepository;
     private final WalletMapper walletMapper;
 
@@ -30,5 +31,10 @@ public class WalletRepositoryAdapter implements GetWalletInfoPort {
         return walletRepository.findByUserCurrencyCode(userId, currencyCode)
                 .map(walletMapper::mapToWallet)
                 .orElseThrow(() -> new NotFoundWalletException("존재하지 않는 지갑입니다. Currency : " + currencyCode));
+    }
+
+    @Override
+    public Wallet withdrawalBalance(Wallet withdrawWallet) {
+        return walletMapper.mapToWallet(walletRepository.save(walletMapper.mapToWalletEntity(withdrawWallet)));
     }
 }

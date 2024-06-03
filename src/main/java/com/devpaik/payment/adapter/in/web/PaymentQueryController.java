@@ -11,7 +11,7 @@ import com.devpaik.payment.application.port.out.user.GetWalletInfoPort;
 import com.devpaik.payment.domain.payment.PaymentEstimate;
 import com.devpaik.payment.domain.user.Wallet;
 import com.devpaik.payment.exception.NotFoundMerchantInfoException;
-import com.devpaik.payment.exception.NotFoundtUserException;
+import com.devpaik.payment.exception.NotFoundUserException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -42,7 +42,7 @@ public class PaymentQueryController {
 
 
         if (!getUserInfoPort.existUser(userId)) {
-            throw new NotFoundtUserException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자 입니다.");
+            throw new NotFoundUserException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자 입니다.");
         }
 
         List<Wallet> wallets = getWalletInfoPort.getMyWalletInfo(userId);

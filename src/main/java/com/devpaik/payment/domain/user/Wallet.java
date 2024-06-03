@@ -1,14 +1,16 @@
 package com.devpaik.payment.domain.user;
 
 import com.devpaik.payment.adapter.out.persistence.user.entity.WalletEntity;
-import com.devpaik.payment.domain.user.field.Balance;
 import com.devpaik.payment.domain.exchangerate.field.CurrencyCode;
+import com.devpaik.payment.domain.payment.field.*;
+import com.devpaik.payment.domain.user.field.Balance;
 import com.devpaik.payment.domain.user.field.UserId;
 import com.devpaik.payment.domain.user.field.WalletId;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 
@@ -74,5 +76,33 @@ public class Wallet implements Serializable {
                 ", currencyCode=" + currencyCode +
                 ", balance=" + balance +
                 '}';
+    }
+
+
+
+    public boolean checkSufficientBalance(AmountTotal amount) {
+        return this.balance.getValue().compareTo(amount.getValue()) > 0;
+    }
+
+    public boolean checkInsufficientBalanceByPayMethodPoint(Amount amount, PaymentMethod paymentMethod) {
+        return paymentMethod.isPoint() && checkInsufficientBalance(amount);
+    }
+
+    public Wallet withdrawWallet(WalletAmount walletAmount) {
+        return new Wallet(this.walletId, this.userId, this.currencyCode, withdrawBalance(walletAmount));
+    }
+
+    public AfterBalance parseAfterBalance() {
+        return new AfterBalance(this.balance.getValue());
+    }
+    private boolean checkInsufficientBalance(Amount amount) {
+        return this.balance.getValue().compareTo(amount.getValue()) < 0;
+    }
+
+    private Balance withdrawBalance(WalletAmount walletAmount) {
+        if (CurrencyCode.KRW.equals(this.currencyCode.getValue())) {
+            return new Balance(this.balance.getValue().subtract(walletAmount.getValue()).setScale(0, RoundingMode.FLOOR));
+        }
+        return new Balance(this.balance.getValue().subtract(walletAmount.getValue()).setScale(2, RoundingMode.FLOOR));
     }
 }

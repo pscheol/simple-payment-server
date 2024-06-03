@@ -1,5 +1,6 @@
 package com.devpaik.payment.domain.payment.field;
 
+import com.devpaik.payment.domain.exchangerate.field.ExchangeRate;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -11,6 +12,13 @@ public class WonAmount implements Serializable {
 
     public WonAmount(Long value) {
         this.value = value;
+    }
+
+    public static WonAmount calculateWonAmount(AmountTotal amountTotal, ExchangeRate exchangeRate) {
+        if (Objects.isNull(exchangeRate)) {
+            return new WonAmount(amountTotal.getValue().longValue());
+        }
+        return new WonAmount(amountTotal.getValue().multiply(exchangeRate.getValue()).longValue());
     }
 
     @Override

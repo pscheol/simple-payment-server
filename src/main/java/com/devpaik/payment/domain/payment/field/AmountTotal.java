@@ -31,4 +31,5 @@ public class AmountTotal implements Serializable {
     public String toString() {
         return String.valueOf(value);
     }
+
 }

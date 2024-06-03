@@ -14,6 +14,10 @@ public class PaymentDtm implements Serializable {
         this.datetime = datetime;
     }
 
+    public static PaymentDtm nowDtm() {
+        return new PaymentDtm(LocalDateTime.now());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

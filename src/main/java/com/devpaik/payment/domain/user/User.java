@@ -7,6 +7,7 @@ import com.devpaik.payment.domain.user.field.UserId;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,11 +33,12 @@ public class User implements Serializable {
         this.wallets = new HashMap<>();
     }
 
-    public User(UserId userId, Name name, CreateDtm createDtm, Map<CurrencyCode, Wallet> wallets) {
-        this.userId = userId;
-        this.name = name;
-        this.createDtm = createDtm;
-        this.wallets = wallets;
+    public static User createUser(String userId, String name, LocalDateTime createDtm) {
+        return new User(
+               new UserId(userId),
+               new Name(name),
+               new CreateDtm(createDtm)
+        );
     }
 
     @Override

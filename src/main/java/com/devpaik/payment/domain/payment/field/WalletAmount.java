@@ -1,9 +1,12 @@
 package com.devpaik.payment.domain.payment.field;
 
+import com.devpaik.payment.domain.exchangerate.field.CurrencyCode;
+import com.devpaik.payment.domain.user.field.Balance;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 public class WalletAmount implements Serializable {
@@ -12,6 +15,13 @@ public class WalletAmount implements Serializable {
 
     public WalletAmount(BigDecimal value) {
         this.value = value;
+    }
+
+    public static WalletAmount create(BigDecimal value, CurrencyCode currencyCode) {
+        if (CurrencyCode.KRW.equals(currencyCode.getValue())) {
+            return new WalletAmount(value.setScale(0, RoundingMode.FLOOR));
+        }
+        return new WalletAmount(value.setScale(2, RoundingMode.FLOOR));
     }
 
     @Override

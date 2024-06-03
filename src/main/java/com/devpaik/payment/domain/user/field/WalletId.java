@@ -1,9 +1,11 @@
 package com.devpaik.payment.domain.user.field;
 
+import com.devpaik.payment.domain.user.Wallet;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 public class WalletId implements Serializable {
     @Getter
@@ -11,6 +13,10 @@ public class WalletId implements Serializable {
 
     public WalletId(String id) {
         this.id = id;
+    }
+
+    public static String genWalletId() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
     @Override

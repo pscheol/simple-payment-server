@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 public class PaymentId implements Serializable {
     @Getter
@@ -11,6 +12,10 @@ public class PaymentId implements Serializable {
 
     public PaymentId(String id) {
         this.id = id;
+    }
+
+    public static PaymentId createUUID() {
+        return new PaymentId(UUID.randomUUID().toString().replaceAll("-", ""));
     }
 
     @Override

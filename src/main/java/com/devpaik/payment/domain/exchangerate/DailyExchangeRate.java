@@ -8,6 +8,8 @@ import com.devpaik.payment.domain.exchangerate.field.ExchangeRate;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class DailyExchangeRate implements Serializable {
@@ -23,11 +25,29 @@ public class DailyExchangeRate implements Serializable {
     @Getter
     private final CurrentDtm currentDtm;
 
+    private DailyExchangeRate() {
+        this(null, null, null, null);
+    }
+
     private DailyExchangeRate(DailyId dailyId, CurrencyCode currencyCode, ExchangeRate exchangeRate, CurrentDtm currentDtm) {
         this.dailyId = dailyId;
         this.currencyCode = currencyCode;
         this.exchangeRate = exchangeRate;
         this.currentDtm = currentDtm;
+    }
+
+
+    public static DailyExchangeRate createDailyExchangeRate(Long dailyId, String currencyCode, BigDecimal exchangeRate, LocalDateTime currentDtm) {
+        return new DailyExchangeRate(
+                new DailyId(dailyId),
+                new CurrencyCode(currencyCode),
+                new ExchangeRate(exchangeRate),
+                new CurrentDtm(currentDtm)
+        );
+
+    }
+    public static DailyExchangeRate emptyInstance() {
+        return new DailyExchangeRate();
     }
 
     public static DailyExchangeRate createDailyExchangeRateByEntity(DailyExchangeRateEntity entity) {

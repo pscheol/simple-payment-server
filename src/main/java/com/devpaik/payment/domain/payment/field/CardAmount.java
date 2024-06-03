@@ -1,9 +1,11 @@
 package com.devpaik.payment.domain.payment.field;
 
+import com.devpaik.payment.domain.exchangerate.field.CurrencyCode;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 public class CardAmount implements Serializable {
@@ -12,6 +14,21 @@ public class CardAmount implements Serializable {
 
     public CardAmount(BigDecimal value) {
         this.value = value;
+    }
+
+    public static CardAmount calculateSubtract(WalletAmount walletAmount, AmountTotal amountTotal, CurrencyCode currencyCode) {
+        if (CurrencyCode.KRW.equals(currencyCode.getValue())) {
+            return new CardAmount(amountTotal.getValue().subtract(walletAmount.getValue()).setScale(0, RoundingMode.FLOOR));
+        }
+        return new CardAmount(amountTotal.getValue().subtract(walletAmount.getValue()).setScale(2, RoundingMode.FLOOR));
+    }
+
+    public static CardAmount create(BigDecimal value) {
+        return new CardAmount(value);
+    }
+
+    public static CardAmount createZero() {
+        return new CardAmount(BigDecimal.ZERO);
     }
 
     @Override
@@ -30,5 +47,9 @@ public class CardAmount implements Serializable {
     @Override
     public String toString() {
         return String.valueOf(value);
+    }
+
+    public boolean isNotZero() {
+        return !(this.value.equals(BigDecimal.ZERO));
     }
 }

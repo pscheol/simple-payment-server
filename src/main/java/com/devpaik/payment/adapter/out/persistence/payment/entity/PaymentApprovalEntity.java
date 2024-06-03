@@ -66,7 +66,7 @@ public class PaymentApprovalEntity implements Serializable {
     @Getter
     private BigDecimal amount;
 
-    @Column(name = "fee", precision = 5, scale = 2)
+    @Column(name = "fee", precision = 18, scale = 2)
     @Comment("수수료")
     @Getter
     private BigDecimal fee;

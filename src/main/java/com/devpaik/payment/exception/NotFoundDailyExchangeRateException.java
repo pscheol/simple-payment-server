@@ -1,8 +1,10 @@
 package com.devpaik.payment.exception;
 
-public class NotFoundDailyExchangeRateException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
+public class NotFoundDailyExchangeRateException extends ResponseStatusException {
     public NotFoundDailyExchangeRateException(String message) {
-        super(message);
+        super(HttpStatus.NOT_FOUND, message);
     }
 }
