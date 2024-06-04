@@ -3,10 +3,11 @@
 포인트를 이용한 간단한 결제 승인 시스템
 
 ## 디렉토리 구조
+
 ---
 핵사고날 아키텍처의 Port And Adapter 패턴을 이용하여 구성
 
-![](docs/hexagonal.jpg)
+![핵사고날 아키텍처](docs/hexagonal.jpg)
 
 디렉토리
 
@@ -57,8 +58,60 @@
     * user : 사용자 도메인
 
 
+## 프로세스
+
+---
+### 1. 잔액조회
+
+![잔액조회](docs/잔액조회.png)
+
+1. adapter.in.web 패키지의 매핑된 PaymentQueryController.getBalance() 진입
+2. port-in을 거치지 않고 거치지 않고 port-out에 바로접근
+   1. 사용자 조회 : `getUserInfoPort.existUser(userId)`
+      1. 사용자가 아닐경우 `존재하지 사용자 입니다.` 리턴
+   2. 지갑 조회 : `getWalletInfoPort.getMyWalletInfo(userId)` 
+      1. 지갑이 없을경우 `지갑이 존재하지 않습니다.` 리턴
+3. `WalletView.toBuild(wallets)` 에서 데이터 변환 후 `WalletView` 데이터 리턴
+
+### 2. 결제 예상 금액 결과조회
+
+![결제예상결과조회](docs/결제예상결과조회.png)
+
+1. adapter.in.web 패키지의 매핑된 PaymentQueryController.paymentEstimate() 진입
+2. port-in을 거치지 않고 거치지 않고 port-out에 바로접근
+    1. 상점 조회 : `getMerchantPort.checkMerchantById(request.merchantId())`
+       1. 상점이 아닐경우 `존재하지 않는 상점 정보입니다.` 리턴
+3. 결제 예상금액 계산 : `PaymentEstimateCommand`를 생성하여 imcomping 포트 `paymentEstimateUseCase.calculatePaymentEstimate(command)`를 수행
+   1. 실제 구현부는 `PaymentService.class` 이며 `calculatePaymentEstimate` 메서드에서 수수료와 결제 예상금액을 계산
+4. `PaymentEstimateResponse.toBuild(paymentEstimate)` 에서 데이터 변환 후 `PaymentEstimateResponse` 데이터 리턴
+
+
+### 3. 결제승인요청 
+
+![결제승인요청](docs/결제승인요청.png)
+
+1. adapter.in.web 패키지의 매핑된 PaymentApprovalController.paymentApproval() 진입
+2. port-in을 거치지 않고 거치지 않고 port-out에 바로접근 
+   1. 사용자 조회 : `getUserInfoPort.existUser(userId)`
+      1. 사용자가 아닐경우 `존재하지 사용자 입니다.` 리턴
+   2. 상점 조회 : `getMerchantPort.checkMerchantById(request.merchantId())`
+      1. 상점이 아닐경우 `존재하지 않는 상점 정보입니다.` 리턴
+3. 결제 예상금액 계산 : `PaymentApprovalCommand`를 생성하여 imcomping 포트 `paymentApprovalUseCase.paymentApprovalRequest(command)`를 수행
+    1. 실제 구현부는 `PaymentApprovalService.class` 이며 `paymentApprovalRequest` 에서 지갑조회, 고시환율조회를 조회하여 결제정보 데이터 계산 모델 생성
+    2. 만약 `paymentMethod`가 `point`일 경우 `checkInsufficientBalanceByPayMethodPoint(calculatePayment.paymentMethod(), calculatePayment.cardAmount())` 메서드를 수행하여 잔액이 부족할 경우 `잔액이 부족합니다.` 메시지 리턴;
+    3. 결제정보계산 모델을 가지고 `PaymentApproval` 도메인 생성
+    4. `paymentMethod`가 `creditCard`일 경우 포인트 잔액이 부족하여 카드결제를 수해야하는 경우 `sendCreditCardApproval(command.paymentDetail(), paymentApproval)`를 수행
+    5. `savePaymentApproval(paymentApproval)`에서 결제 승인 정보 저장
+    6. 만약 정상적으로 결제승인이 되면 `withdrawalBalance(calculatePayment)`를 수행하여 포인트 차감
+4. `PaymentAppovalResponse.toBuild(approval)` 에서 데이터 변환 후 `PaymentApprovalResponse` 데이터 리턴
+
+#### 고려사항
+결제 승인요청시 국가별 승인요청 시간을 기준으로 저장하기 위해 `HttpServletRequest`에서 `ZoneId`를 가져옴
+지갑 조회 후 차감 시 Pessimistic Write Lock`@Lock(LockModeType.PESSIMISTIC_WRITE)` 을 추가하여 동시성 보장
+
 
 ## 테이블 명세서
+
 ---
 ![](docs/erd.png)
 
@@ -129,9 +182,8 @@
 | merchant_name | varchar(200) |     |   NULL   |         |   상점명   |
 
 
-
-
 ## API 명세서
+
 ---
 
 ### 통신방법
