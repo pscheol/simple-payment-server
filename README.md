@@ -12,51 +12,87 @@
 디렉토리
 
 ```tree
-└── payment
-    ├── SimplePaymentServerApplication.java
-    ├── adapter
-    │   ├── in
-    │   │   └── web
-    │   └── out
-    │       └── persistence
-    │           ├── exchangerate
-    │           ├── merchant
-    │           ├── payment
-    │           └── user
+ ...
+├── SimplePaymentServerApplication.java
+├── config
+├── exceptions
+├── exchangerate
+│   ├── application
+│   │   ├── output
+│   │   └── usecase
+│   │       ├── command
+│   │       └── service
+│   ├── domain
+│   ├── primary
+│   └── secondary
+│       └── jpa
+│           ├── entity
+│           └── repository
+├── merchant
+│   ├── application
+│   │   ├── output
+│   │   └── usecase
+│   ├── domain
+│   ├── primary
+│   └── secondary
+│       └── jpa
+│           ├── entity
+│           └── repository
+├── payment
+│   ├── application
+│   │   ├── output
+│   │   ├── provider
+│   │   └── usecase
+│   │       ├── command
+│   │       └── service
+│   ├── domain
+│   │   ├── event
+│   │   └── field
+│   ├── exception
+│   ├── primary
+│   │   └── api
+│   │       └── dto
+│   └── secondary
+│       ├── bc
+│       │   ├── exchangerate
+│       │   └── wallet
+│       ├── jpa
+│       │   ├── entity
+│       │   └── repository
+│       └── van
+└── user
     ├── application
-    │   └── port
-    │       ├── in
-    │       └── out
-    ├── config
+    │   ├── output
+    │   └── usecase
+    │       ├── command
+    │       ├── event
+    │       └── service
     ├── domain
-    │   ├── exchangerate
-    │   ├── merchant
-    │   ├── payment
-    │   └── user
-    └── exception
+    ├── exception
+    ├── primary
+    │   └── api
+    └── secondary
+        └── jpa
+            ├── entity
+            └── repository
 ```
-
 * adapter
-    * in : [외부에서 들어온 요청 처리 adapter]
-        * web : 잔액조회, 결제 예상결과, 결제승인요청에 대한 Controller
-    * out : [외부로 모듈과 통신 및 연결 adapter]
-        * persistence
-            * exchangerate : 환율 Entity, Repository
-            * merchant : 상점 Entity, Repository
-            * payment : 결제 Entity, Repository
-            * user : 사용자 Entity, Repository
-    * application [비지니스 로직 어플리케이션]
-        * port : [어플리케이션 계층의 인커밍 포트를 호출하여 내부접근하는 인터페이스와 아웃고잉 포트에 대한 구현을 아웃고잉 어댑터를 가지고 있는 인터페이스]
-          * in : adpater.in에서 내부 비지니스 서비스를 연결 해주는 인터페이스
-          * out : 비지니스 처리 시 외부 adapter.out을 연결 해주는 인터페이스
-* application
-    * service : 비지니스 서비스 처리 구현부
+    * primary : [외부에서 들어온 요청 처리 adapter-in]
+        * api : 잔액조회, 결제 예상결과, 결제승인요청에 대한 Controller
+    * secondary : [외부로 모듈과 통신 및 연결 adapter-out]
+        * jpa
+    * application [어플리케이션 계층]
+      * usecase : [port-in 유스케이스, 서비스 커멘드 관리 패키지]
+        * command : 커멘드 패키지 
+        * service : 비지니스 서비스 처리 구현부
+      * output : 비지니스 처리 시 외부 adapter-out을 연결 해주는 인터페이스
 * domain : [도메인 모델 구성]
-    * exchangerate : 환율관련 도메인
-    * merchant : 상점 도메인
-    * payment : 결제 도메인
-    * user : 사용자 도메인
 
+**도메인**
+* exchangerate : 환율
+* merchant : 상점
+* payment : 결제
+* user : 사용자, 지갑
 
 ## 프로세스
 
@@ -65,7 +101,7 @@
 
 ![잔액조회](docs/잔액조회.png)
 
-1. adapter.in.web 패키지의 매핑된 PaymentQueryController.getBalance() 진입
+1. adapter.in.web 패키지의 매핑된 WalletQueryController.getBalance() 진입
 2. port-in을 거치지 않고 거치지 않고 port-out에 바로접근
    1. 사용자 조회 : `getUserInfoPort.existUser(userId)`
       1. 사용자가 아닐경우 `존재하지 사용자 입니다.` 리턴
@@ -81,7 +117,7 @@
 2. port-in을 거치지 않고 거치지 않고 port-out에 바로접근
     1. 상점 조회 : `getMerchantPort.checkMerchantById(request.merchantId())`
        1. 상점이 아닐경우 `존재하지 않는 상점 정보입니다.` 리턴
-3. 결제 예상금액 계산 : `PaymentEstimateCommand`를 생성하여 imcomping 포트 `paymentEstimateUseCase.calculatePaymentEstimate(command)`를 수행
+3. 결제 예상금액 계산 : `PaymentEstimateCommand`를 생성하여 usecase(port-in) `paymentEstimateUseCase.calculatePaymentEstimate(command)`를 수행
    1. 실제 구현부는 `PaymentService.class` 이며 `calculatePaymentEstimate` 메서드에서 수수료와 결제 예상금액을 계산
 4. `PaymentEstimateResponse.toBuild(paymentEstimate)` 에서 데이터 변환 후 `PaymentEstimateResponse` 데이터 리턴
 
@@ -90,19 +126,19 @@
 
 ![결제승인요청](docs/결제승인요청.png)
 
-1. adapter.in.web 패키지의 매핑된 PaymentApprovalController.paymentApproval() 진입
-2. port-in을 거치지 않고 거치지 않고 port-out에 바로접근 
+1. primary.api 패키지의 매핑된 PaymentApprovalController.paymentApproval() 진입
+2. port-in을 거치지 않고 거치지 않고 port-out에 바로접근
    1. 사용자 조회 : `getUserInfoPort.existUser(userId)`
       1. 사용자가 아닐경우 `존재하지 사용자 입니다.` 리턴
    2. 상점 조회 : `getMerchantPort.checkMerchantById(request.merchantId())`
       1. 상점이 아닐경우 `존재하지 않는 상점 정보입니다.` 리턴
-3. 결제 예상금액 계산 : `PaymentApprovalCommand`를 생성하여 imcomping 포트 `paymentApprovalUseCase.paymentApprovalRequest(command)`를 수행
+3. 결제 예상금액 계산 : `PaymentApprovalCommand`를 생성하여 usecase(port-in) `paymentApprovalUseCase.paymentApprovalRequest(command)`를 수행
     1. 실제 구현부는 `PaymentApprovalService.class` 이며 `paymentApprovalRequest` 에서 지갑조회, 고시환율조회를 조회하여 결제정보 데이터 계산 모델 생성
-    2. 만약 `paymentMethod`가 `point`일 경우 `checkInsufficientBalanceByPayMethodPoint(calculatePayment.paymentMethod(), calculatePayment.cardAmount())` 메서드를 수행하여 잔액이 부족할 경우 `잔액이 부족합니다.` 메시지 리턴;
+    2. 만약 `paymentMethod`가 `point`일 경우 `calculatePayment.checkInsufficientBalanceByPayMethodPoint();`를 검증하여 메서드를 수행하여 잔액이 부족할 경우 `잔액이 부족합니다.` 메시지 리턴;
     3. 결제정보계산 모델을 가지고 `PaymentApproval` 도메인 생성
     4. `paymentMethod`가 `creditCard`일 경우 포인트 잔액이 부족하여 카드결제를 수해야하는 경우 `sendCreditCardApproval(command.paymentDetail(), paymentApproval)`를 수행
     5. `savePaymentApproval(paymentApproval)`에서 결제 승인 정보 저장
-    6. 만약 정상적으로 결제승인이 되면 `withdrawalBalance(calculatePayment)`를 수행하여 포인트 차감
+    6. 만약 정상적으로 결제승인이 되면 `eventPublisher.publishEvent(calculatePayment.withdrawalBalanceEvent());` 이벤트를 수행하여 포인트 차감
 4. `PaymentAppovalResponse.toBuild(approval)` 에서 데이터 변환 후 `PaymentApprovalResponse` 데이터 리턴
 
 #### 고려사항
@@ -246,14 +282,14 @@
 
 현재 보유하고 있는 지갑의 잔액을 조회
 
-- URI : /api/payment/balance/{userId}
+- URI : /api/wallets/balance/{userId}
 - Method : GET
 
 * curl
 
 ```curl
 curl -X 'GET' \
-  'http://localhost:8080/api/payment/balance/user1234' \
+  'http://localhost:8080/api/wallets/balance/user1234' \
   -H 'accept: */*'
 ```
 
@@ -286,7 +322,7 @@ curl -X 'GET' \
 
 결제금액에 대한 예상 결제 가격 및 결제 수수료 조회
 
-- URI : /api/payment/estimate
+- URI : /api/payments/estimate
 - Method : POST
 
 
@@ -313,7 +349,7 @@ curl -X 'GET' \
 
 ```curl
 curl -X 'POST' \
-  'http://localhost:8080/api/payment/estimate' \
+  'http://localhost:8080/api/payments/estimate' \
   -H 'accept: */*' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -349,7 +385,7 @@ paymentMethod type에 따른 결제 처리
 creditCard : 지갑 잔액이 충분할 경우 포인트로 결제하고, 지갑 잔액이 부족할 경우 차액만큼 신용카드로 결제
 point : 지갑잔액이 충분할 경우 포인트로 결제하고, 지갑 잔액이 부족할 경우 지갑 잔액 부족 메시지 결과 표시
 
-- URI : /api/payment/approval
+- URI : /api/payments/approval
 - Method : POST
 
 
@@ -391,7 +427,7 @@ point : 지갑잔액이 충분할 경우 포인트로 결제하고, 지갑 잔�
 
 ```curl
 curl -X 'POST' \
-  'http://localhost:8080/api/payment/approval' \
+  'http://localhost:8080/api/payments/approval' \
   -H 'accept: */*' \
   -H 'Content-Type: application/json' \
   -d '{
